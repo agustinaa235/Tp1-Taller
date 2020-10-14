@@ -27,7 +27,7 @@ int socket_inicializar(socket_t* self){
 
 int socket_bine_and_listen(socket_t* self, const char* host, const char* service){
       int verificacion = 0;
-      int file_descriptor = 0;
+      int file_descriptor = -2;
       bool no_pude_binear = true;
       struct addrinfo hints;
       struct addrinfo *resultado, *rp;
@@ -59,7 +59,6 @@ int socket_bine_and_listen(socket_t* self, const char* host, const char* service
                   self->file_descriptor = file_descriptor;
                   printf(" binie");
               }
-
           }
           rp = rp->ai_next;
       }
@@ -88,8 +87,8 @@ int socket_acceptar(socket_t* listener, socket_t* peer){
 }
 
 int socket_conectar(socket_t* self, const char* host, const char* service){
-
     int file_descriptor = -2;
+
     bool no_conectado = true;
     struct addrinfo hints;
     struct addrinfo *resultado, *auxiliar;
@@ -105,7 +104,6 @@ int socket_conectar(socket_t* self, const char* host, const char* service){
     }
     auxiliar = resultado;
     while(auxiliar != NULL && no_conectado){
-      
         file_descriptor = socket(auxiliar->ai_family, auxiliar->ai_socktype, auxiliar->ai_protocol);
         printf(" file descriptro: %i\n", file_descriptor);
         if (file_descriptor < 0){

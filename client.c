@@ -55,21 +55,31 @@ static void mandar_mensaje(const char* mensaje, int tamanio_mensaje, void* callb
 }
 
 
+//client
 int main(int argc, char *argv[]){
 
     char nombre_archivo[TAMANIO_MAXIMO];
-    strncpy(nombre_archivo,argv[4], TAMANIO_MAXIMO);
-    char* funcion = (argv[2] + 9);
-    file_lector_t file_lector;
-    file_lector_inicializar(&file_lector, nombre_archivo);
+    char host[TAMANIO_MAXIMO];
+    strncpy(host,argv[1], TAMANIO_MAXIMO);
+    char service[TAMANIO_MAXIMO];
+    strncpy(service, argv[2], TAMANIO_MAXIMO);
+    char key[TAMANIO_MAXIMO];
+    strncpy(key, argv[4], TAMANIO_MAXIMO);
+    strncpy(nombre_archivo,argv[5], TAMANIO_MAXIMO);
+    char* funcion = (argv[3] + 9);
+    //file_lector_t file_lector;
+
+    //file_lector_inicializar(&file_lector, nombre_archivo);
+
 
     socket_t socket;
-    socket_inicializar(&socket);
-    socket_conectar(&socket, "local host", "7777");
+    int verificacion = socket_conectar(&socket, "127.0.0.1", "8080");
+    printf("se conceto: %i\n", verificacion);
+    socket_enviar(&socket, "hola", 5 );
 
-    file_lector_iterar(&file_lector, mandar_mensaje, &socket);
-    socket_destruir(&socket);
-    file_lector_destruir(&file_lector);
+    //file_lector_iterar(&file_lector, mandar_mensaje, &socket);
+    //socket_destruir(&socket);
+    //file_lector_destruir(&file_lector);
 
 
 }

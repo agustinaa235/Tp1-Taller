@@ -3,9 +3,10 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <netdb.h>
 
 typedef struct socket {
-   int socket;
+   int file_descriptor;
 }socket_t;
 
 int socket_inicializar(socket_t* self);
