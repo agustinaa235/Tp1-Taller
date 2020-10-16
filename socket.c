@@ -27,7 +27,7 @@ int socket_inicializar(socket_t* self){
 
 int socket_bine_and_listen(socket_t* self, const char* host, const char* service){
       int verificacion = 0;
-      int file_descriptor = 0;
+      int file_descriptor = -2;
       bool no_pude_binear = true;
       struct addrinfo hints;
       struct addrinfo *resultado, *rp;
@@ -59,7 +59,6 @@ int socket_bine_and_listen(socket_t* self, const char* host, const char* service
                   self->file_descriptor = file_descriptor;
                   printf(" binie");
               }
-
           }
           rp = rp->ai_next;
       }
@@ -88,8 +87,8 @@ int socket_acceptar(socket_t* listener, socket_t* peer){
 }
 
 int socket_conectar(socket_t* self, const char* host, const char* service){
-
     int file_descriptor = -2;
+
     bool no_conectado = true;
     struct addrinfo hints;
     struct addrinfo *resultado, *auxiliar;
@@ -105,7 +104,6 @@ int socket_conectar(socket_t* self, const char* host, const char* service){
     }
     auxiliar = resultado;
     while(auxiliar != NULL && no_conectado){
-      
         file_descriptor = socket(auxiliar->ai_family, auxiliar->ai_socktype, auxiliar->ai_protocol);
         printf(" file descriptro: %i\n", file_descriptor);
         if (file_descriptor < 0){
@@ -131,49 +129,47 @@ int socket_conectar(socket_t* self, const char* host, const char* service){
     return EXITO;
 }
 
-size_t socket_enviar(socket_t* self, const char* mensaje, size_t tamanio){
+int socket_enviar(socket_t* self, const char* mensaje, size_t tamanio){
 
     int bytes_enviados = 0;
     bool hubo_un_error = false;
     int verificacion = 0;
     while (bytes_enviados < tamanio && hubo_un_error == false) {
-        verificacion = send(self->file_descriptor, &mensaje, tamanio - bytes_enviados, MSG_NOSIGNAL);
+        verificacion = send(self->file_descriptor, &mensaje[bytes_enviados], (tamanio - bytes_enviados), MSG_NOSIGNAL);
         if (verificacion > 0) {
             bytes_enviados += verificacion;
+            printf(" bytes enviados\n: %i", bytes_enviados);
         } else {
             printf("Error: %s\n", strerror(errno));
             hubo_un_error = true;
         }
     }
+    if(hubo_un_error){
+        return ERROR;
+    }
+    return EXITO;
 }
 
-size_t socket_recibir(socket_t* self, char* mensaje, size_t tamanio){
+int socket_recibir(socket_t* self, char* mensaje, size_t tamanio){
 
     int verificacion = 0;
     bool hubo_un_error = false;
     int bytes_recibidos = 0;
     bool se_cerro_el_socket = false;
     while (hubo_un_error == false && se_cerro_el_socket == false) {
-        verificacion = recv(self->file_descriptor, &mensaje, tamanio - bytes_recibidos - 1, 0);
+        verificacion = recv(self->file_descriptor, &mensaje[bytes_recibidos], (tamanio - bytes_recibidos - 1), 0);
 
         if (verificacion == -1) {
             printf("Error: %s\n", strerror(errno));
             hubo_un_error = true;
         } else if (verificacion == 0) {
-          // cerraron el socket del otro lado:
-          // voy a asumir que nos dieron toda la respuesta (estoy simplificando esto)
+
             se_cerro_el_socket = true;
         } else {
             bytes_recibidos += verificacion;
         }
     }
 
-
-    /* Le decimos a la otra maquina que cerramos la coneccion */
-    shutdown(self->file_descriptor, SHUT_RDWR);
-
-    /* Cerramos el socket */
-    close(self->file_descriptor);
 
     if (hubo_un_error) {
       return ERROR;   // hubo un error, somos consistentes y salimos con un codigo de error
@@ -183,6 +179,8 @@ size_t socket_recibir(socket_t* self, char* mensaje, size_t tamanio){
 }
 
 void socket_destruir(socket_t* self){
-
-    close(self->file_descriptor);
+    if (self->file_descriptor > 0){
+        shutdown(self->file_descriptor, SHUT_RDWR);
+        close(self->file_descriptor);
+    }
 }
