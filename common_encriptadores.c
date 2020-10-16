@@ -1,4 +1,4 @@
-#include "encriptadores.h"
+#include "common_encriptadores.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -41,7 +41,7 @@ int descifrar_cesar(unsigned char* mensaje, char* key){
 
       i++;
     }
-  
+
     return EXITO;
 }
 
@@ -96,9 +96,10 @@ unsigned char rc4_output(unsigned char* s_box) {
 }
 
 int cifrado_rc4(unsigned char* mensaje, char* key){
-    unsigned char* s_box;
+    unsigned char* s_box = 0;
     int j = 0;
-    for (int i = 0; i < 256; i++){
+    int i;
+    for (i = 0; i < 256; i++){
         s_box[i] = i;
     }
     for (int i = j = 0; i < 256; i++) {

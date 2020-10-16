@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
     socket_inicializar(&peer);
     socket_bine_and_listen(&socket, NULL, service);
 
-    int aceptar = socket_acceptar(&socket,&peer);
+    socket_acceptar(&socket,&peer);
     char respuesta[TAMANIO_MAXIMO] = "";
     socket_recibir(&peer, respuesta, TAMANIO_MAXIMO, desencriptar_mensaje, &encriptador);
     //encriptador_desencriptar(&encriptador, (unsigned char*)respuesta);

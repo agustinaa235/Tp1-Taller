@@ -5,10 +5,6 @@
 #define MENSAJE_TAMANIO 64
 
 int lector_inicializar(lector_t* self, const char* file_nombre){
-/*
-    if(file_nombre !=NULL){
-        self->file = fopen(file_nombre, "rb");
-    }*/
 
     self->file = stdin;
 

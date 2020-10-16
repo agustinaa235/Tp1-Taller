@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200112L
 #include "common_socket.h"
 
 #include <string.h>
@@ -5,6 +6,7 @@
 #include <errno.h>
 
 #include <stdbool.h>
+
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -14,6 +16,7 @@
 #define ESCUCHA_POR_CONEXIONES 5
 #define ERROR 1
 #define EXITO 0
+
 
 
 
