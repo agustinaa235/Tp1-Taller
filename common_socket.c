@@ -1,4 +1,4 @@
-#include "socket.h"
+#include "common_socket.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -38,33 +38,27 @@ int socket_bine_and_listen(socket_t* self, const char* host, const char* service
 
       verificacion = getaddrinfo(host, service, &hints, &resultado);
       if (verificacion != 0){
-          printf(" no funciona get addrinfo");
           return ERROR;
       }
       rp = resultado;
       while(rp != NULL && no_pude_binear){
 
           file_descriptor = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-            printf(" file descriptro: %i\n", file_descriptor);
           if (file_descriptor == -1){
-              printf("Error: %s\n", strerror(errno));
-              printf(" no creo el socket");
           } else {
               if (bind(file_descriptor, rp->ai_addr, rp->ai_addrlen) == -1){
                   close(file_descriptor);
-                  printf(" no pude binear");
-                  printf("Error: %s\n", strerror(errno));
               } else {
                   no_pude_binear = false;
                   self->file_descriptor = file_descriptor;
-                  printf(" binie");
+
               }
           }
           rp = rp->ai_next;
       }
 
       if (no_pude_binear){
-          printf(" no me concete");
+
           return ERROR; // no nos pudimos concetar a nnguna dirreccion
       }
 
@@ -98,32 +92,30 @@ int socket_conectar(socket_t* self, const char* host, const char* service){
     hints.ai_flags = 0;              /* None (or AI_PASSIVE for server) */
 
     if (getaddrinfo(host, service, &hints, &resultado) != 0){
-        printf("Error: %s\n", strerror(errno));
-        printf("no funciona getaddrinfo");
+
         return ERROR;
     }
     auxiliar = resultado;
     while(auxiliar != NULL && no_conectado){
         file_descriptor = socket(auxiliar->ai_family, auxiliar->ai_socktype, auxiliar->ai_protocol);
-        printf(" file descriptro: %i\n", file_descriptor);
+
         if (file_descriptor < 0){
-            printf("Error: %s\n", strerror(errno));
-            printf("no creo el socket\n");
+            no_conectado = true;
         } else {
             if(connect(file_descriptor, auxiliar->ai_addr, auxiliar->ai_addrlen) == -1){
                 close(file_descriptor);
-                printf("no pude concetarme\n");
+
             } else {
                 no_conectado = false;
                 self->file_descriptor = file_descriptor;
-                printf(" si me concete\n");
+
             }
         }
         auxiliar = auxiliar->ai_next;
     }
     freeaddrinfo(resultado);
     if (no_conectado == true){
-        printf(" no me concete");
+
         return ERROR; // no nos pudimos concetar a nnguna dirreccion
     }
     return EXITO;
@@ -138,7 +130,7 @@ int socket_enviar(socket_t* self, const char* mensaje, size_t tamanio){
         verificacion = send(self->file_descriptor, &mensaje[bytes_enviados], (tamanio - bytes_enviados), MSG_NOSIGNAL);
         if (verificacion > 0) {
             bytes_enviados += verificacion;
-            printf(" bytes enviados\n: %i", bytes_enviados);
+
         } else {
             printf("Error: %s\n", strerror(errno));
             hubo_un_error = true;
@@ -150,7 +142,7 @@ int socket_enviar(socket_t* self, const char* mensaje, size_t tamanio){
     return EXITO;
 }
 
-int socket_recibir(socket_t* self, char* mensaje, size_t tamanio){
+int socket_recibir(socket_t* self, char* mensaje, size_t tamanio, socket_callback_t callback, void* callback_3){
 
     int verificacion = 0;
     bool hubo_un_error = false;
@@ -167,10 +159,14 @@ int socket_recibir(socket_t* self, char* mensaje, size_t tamanio){
             se_cerro_el_socket = true;
         } else {
             bytes_recibidos += verificacion;
+            //mensaje[bytes_recibidos] = 0;
+            callback(callback_3, mensaje);
+            mensaje[bytes_recibidos] = '\0';
+            fwrite(mensaje, 1, bytes_recibidos, stdout);
+            bytes_recibidos = 0;
         }
+        printf("\n");
     }
-
-
     if (hubo_un_error) {
       return ERROR;   // hubo un error, somos consistentes y salimos con un codigo de error
     } else {

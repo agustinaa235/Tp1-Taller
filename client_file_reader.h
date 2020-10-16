@@ -1,5 +1,5 @@
-#ifndef _FILE_READER_H
-#define _FILE_READER_H
+#ifndef _CLIENT_FILE_READER_H
+#define _CLIENT_FILE_READER_H
 
 #include  <stdio.h>
 

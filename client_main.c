@@ -1,8 +1,8 @@
 #include  <stdio.h>
 #include <string.h>
-#include "socket.h"
-#include "encriptadores.h"
-#include "file_reader.h"
+#include "common_socket.h"
+#include "common_encriptadores.h"
+#include "client_file_reader.h"
 
 #define EXITO 0
 #define ERROR 0
@@ -21,7 +21,7 @@ static void mandar_mensaje(const char* mensaje, int tamanio_mensaje, void* callb
 
 }
 
-void verificar_encriptador(encriptador_t* encriptador, const char* encriptador_elegido,void* key){
+void verificar_encriptador(encriptador_t* encriptador, const char* encriptador_elegido, char* key){
     //printf("key:%i\n", *(int*)key);
 
     if (strcmp(encriptador_elegido, CESAR) == 0){
@@ -41,8 +41,7 @@ static void encriptar_mensaje(void* callback_2, const char* mensaje){
 
 //client
 int main(int argc, char *argv[]){
-
-    char nombre_archivo[TAMANIO_MAXIMO];
+  //  char nombre_archivo[TAMANIO_MAXIMO];
     char host[TAMANIO_MAXIMO];
     const char* key_entrada = (argv[4] + 6);
     strncpy(host,argv[1], TAMANIO_MAXIMO);
@@ -50,12 +49,13 @@ int main(int argc, char *argv[]){
     strncpy(service, argv[2], TAMANIO_MAXIMO);
     char key[TAMANIO_MAXIMO];
     strncpy(key, key_entrada, TAMANIO_MAXIMO);
-    strncpy(nombre_archivo,(argv[5]), TAMANIO_MAXIMO);
+  //  strncpy(nombre_archivo,(argv[5]), TAMANIO_MAXIMO);
     const char* funcion = (argv[3] + 9);
+
     encriptador_t encriptador;
     verificar_encriptador(&encriptador, funcion, key);
     lector_t lector;
-    lector_inicializar(&lector, nombre_archivo);
+    lector_inicializar(&lector, NULL);
 
 
     socket_t socket;

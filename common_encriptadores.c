@@ -1,4 +1,4 @@
-#include "common_encriptadores.h"
+#include "encriptadores.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -41,7 +41,7 @@ int descifrar_cesar(unsigned char* mensaje, char* key){
 
       i++;
     }
-
+  
     return EXITO;
 }
 
