@@ -7,16 +7,15 @@
 #define EXITO 0
 
 
-int encriptador_inicializar(encriptador_t *self, char* key, int (*funcion)(unsigned char*, char*)){
-
+int encriptador_inicializar(encriptador_t *self,
+                            char* key,
+                            int (*funcion)(unsigned char*, char*)){
     self->key = key;
     self->funcion = funcion;
     return EXITO;
 }
 
-
 int cesar(unsigned char* mensaje, int key){
-
     int i = 0;
     while (mensaje[i] != '\0'){
       mensaje[i] = (mensaje[i] + key);
@@ -32,7 +31,6 @@ int cifrado_cesar(unsigned char* mensaje, char* key){
 }
 
 int descifrar_cesar(unsigned char* mensaje, char* key){
-
     int key_aux = 0;
     key_aux = atoi(key);
     int i = 0;
@@ -41,13 +39,10 @@ int descifrar_cesar(unsigned char* mensaje, char* key){
 
       i++;
     }
-
     return EXITO;
 }
 
-
 int cifrado_vigenere(unsigned char* mensaje, char* key){
-
     int i = 0;
     int j = 0;
     while (mensaje[i] != '\0'){
@@ -59,19 +54,16 @@ int cifrado_vigenere(unsigned char* mensaje, char* key){
       j++;
   }
   return EXITO;
-
 }
 
 int descrifrado_vigenere(unsigned char* mensaje, char* key){
     int i = 0;
     int j = 0;
-
     while (mensaje[i] != '\0'){
         if (key[j] == '\0'){
             j = 0;
         }
         mensaje[i] = (mensaje[i] - key[j]);
-        printf( "|%i|", mensaje[i]);
         i++;
         j++;
     }
@@ -98,13 +90,12 @@ unsigned char rc4_output(unsigned char* s_box) {
 int cifrado_rc4(unsigned char* mensaje, char* key){
     unsigned char* s_box = 0;
     int j = 0;
-    int i;
-    for (i = 0; i < 256; i++){
+    for (int i = 0; i < 256; i++){
         s_box[i] = i;
     }
-    for (int i = j = 0; i < 256; i++) {
-        j = (j + key[i % strlen(key)] + s_box[i]);
-        swap(s_box, i, j);
+    for (int x = j = 0; x < 256; x++) {
+        j = (j + key[x % strlen(key)] + s_box[x]);
+        swap(s_box, x, j);
     }
     return *mensaje^rc4_output(s_box);
 }

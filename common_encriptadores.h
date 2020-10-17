@@ -10,7 +10,9 @@ typedef struct encriptador {
 } encriptador_t;
 
 
-int encriptador_inicializar(encriptador_t *self, char* key, int (*funcion)(unsigned char*, char*));
+int encriptador_inicializar(encriptador_t *self,
+                            char* key,
+                            int (*funcion)(unsigned char*, char*));
 int encriptador_encriptar(encriptador_t *self, unsigned char* mensaje);
 int encriptador_desencriptar(encriptador_t* self, unsigned char* mensaje);
 
