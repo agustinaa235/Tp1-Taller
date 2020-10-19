@@ -2,25 +2,19 @@
 #define _COMMON_ENCRIPTADORES_H
 
 
-
-
 typedef struct encriptador {
-      char* key;
-      int(*funcion)(unsigned char* mensaje, char* key);
+      char* funcion;
+      void* tipo_de_encriptador;
 } encriptador_t;
 
+int encriptador_inicializar(encriptador_t *self,const char* funcion,
+                            void* tipo_de_encriptador);
 
-int encriptador_inicializar(encriptador_t *self,
-                            char* key,
-                            int (*funcion)(unsigned char*, char*));
-int encriptador_encriptar(encriptador_t *self, unsigned char* mensaje);
-int encriptador_desencriptar(encriptador_t* self, unsigned char* mensaje);
+int encriptador_encriptar(encriptador_t *self, unsigned char* mensaje,
+                          int tamanio);
 
-int cifrado_cesar(unsigned char* mensaje, char* key);
-int descifrar_cesar(unsigned char* mensaje, char* key);
-int cifrado_vigenere(unsigned char* mensaje, char* key);
-int descrifrado_vigenere(unsigned char* mensaje, char* key);
-int cifrado_rc4(unsigned char* mensaje, char* key);
+int encriptador_desencriptar(encriptador_t* self, unsigned char* mensaje,
+                              int tamanio);
 
 int encriptador_destruir(encriptador_t *self);
 

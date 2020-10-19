@@ -1,108 +1,50 @@
 #include "common_encriptadores.h"
+#include "common_cesar.h"
+#include "common_vigenere.h"
+#include "common_rc4.h"
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-
 
 #define EXITO 0
+#define ERROR 0
+#define CESAR "cesar"
+#define VIGENERE "vigenere"
+#define RC4 "rc4"
 
 
-int encriptador_inicializar(encriptador_t *self,
-                            char* key,
-                            int (*funcion)(unsigned char*, char*)){
-    self->key = key;
+int encriptador_inicializar(encriptador_t *self, const char* funcion,
+                            void* tipo_de_encriptador){
     self->funcion = funcion;
+    self->tipo_de_encriptador = tipo_de_encriptador;
     return EXITO;
 }
 
-int cesar(unsigned char* mensaje, int key){
-    int i = 0;
-    while (mensaje[i] != '\0'){
-      mensaje[i] = (mensaje[i] + key);
-      i++;
+int encriptador_verificar_encriptacion(encriptador_t* self,
+                                       unsigned char* mensaje, int tamanio,
+                                       int formato){
+    if(strcmp(self->funcion, CESAR)==0){
+        return cesar_cifrado((cesar_t*)self->tipo_de_encriptador, mensaje,
+                              tamanio, formato);
+    }else if( strcmp(self->funcion, VIGENERE)==0){
+        return vigenere_cifrado((vigenere_t*)self->tipo_de_encriptador, mensaje,
+                                 tamanio, formato);
+    }else if (strcmp(self->funcion, RC4) == 0){
+        return rc4_cifrado((rc4_t*)self->tipo_de_encriptador,mensaje, tamanio,
+                            formato);
+    } else {
+        return ERROR;
     }
+}
+
+int encriptador_encriptar(encriptador_t *self, unsigned char* mensaje,
+                          int tamanio){
+      return encriptador_verificar_encriptacion(self, mensaje, tamanio, 1);
+}
+int encriptador_desencriptar(encriptador_t* self, unsigned char* mensaje,
+                             int tamanio){
+      return encriptador_verificar_encriptacion(self, mensaje, tamanio, -1);
+}
+
+int encriptador_destruir(encriptador_t* self){
     return EXITO;
-}
-
-int cifrado_cesar(unsigned char* mensaje, char* key){
-    int key_aux = 0;
-    key_aux = atoi(key);
-    return cesar(mensaje, key_aux);
-}
-
-int descifrar_cesar(unsigned char* mensaje, char* key){
-    int key_aux = 0;
-    key_aux = atoi(key);
-    int i = 0;
-    while (mensaje[i]!= '\0'){
-      mensaje[i] = (mensaje[i] - key_aux);
-
-      i++;
-    }
-    return EXITO;
-}
-
-int cifrado_vigenere(unsigned char* mensaje, char* key){
-    int i = 0;
-    int j = 0;
-    while (mensaje[i] != '\0'){
-      if (key[j] == '\0'){
-          j = 0;
-      }
-      mensaje[i] = (mensaje[i] + key[j]);
-      i++;
-      j++;
-  }
-  return EXITO;
-}
-
-int descrifrado_vigenere(unsigned char* mensaje, char* key){
-    int i = 0;
-    int j = 0;
-    while (mensaje[i] != '\0'){
-        if (key[j] == '\0'){
-            j = 0;
-        }
-        mensaje[i] = (mensaje[i] - key[j]);
-        i++;
-        j++;
-    }
-    return EXITO;
-}
-
-void swap(unsigned char *s_box, unsigned int i, unsigned int j) {
-    unsigned char aux = s_box[i];
-    s_box[i] = s_box[j];
-    s_box[j] = aux;
-}
-
-unsigned char rc4_output(unsigned char* s_box) {
-    int i = 0;
-    int j = 0;
-    i = (i + 1) & 255;
-    j = (j + s_box[i]);
-
-    swap(s_box, i, j);
-
-    return s_box[(s_box[i] + s_box[j]) & 255];
-}
-
-int cifrado_rc4(unsigned char* mensaje, char* key){
-    unsigned char* s_box = 0;
-    int j = 0;
-    for (int i = 0; i < 256; i++){
-        s_box[i] = i;
-    }
-    for (int x = j = 0; x < 256; x++) {
-        j = (j + key[x % strlen(key)] + s_box[x]);
-        swap(s_box, x, j);
-    }
-    return *mensaje^rc4_output(s_box);
-}
-
-int encriptador_encriptar(encriptador_t *self, unsigned char* mensaje){
-      return self->funcion(mensaje,self->key);
-}
-int encriptador_desencriptar(encriptador_t* self, unsigned char* mensaje){
-      return self->funcion(mensaje, self->key);
 }

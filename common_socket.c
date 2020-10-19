@@ -68,6 +68,7 @@ int socket_bine_and_listen(socket_t* self,
 int socket_acceptar(socket_t* listener, socket_t* peer){
       peer->file_descriptor = accept(listener->file_descriptor, NULL, NULL);
       if (peer->file_descriptor == -1){
+          close(listener->file_descriptor);
           return ERROR;
       }
       return EXITO;
@@ -109,6 +110,10 @@ int socket_conectar(socket_t* self, const char* host, const char* service){
 }
 
 int socket_enviar(socket_t* self, const char* mensaje, size_t tamanio){
+    if (self->file_descriptor < 0){
+        socket_destruir(self);
+        return ERROR;
+    }
     int bytes_enviados = 0;
     bool hubo_un_error = false;
     while (bytes_enviados < tamanio && hubo_un_error == false) {
@@ -117,7 +122,6 @@ int socket_enviar(socket_t* self, const char* mensaje, size_t tamanio){
         if (verificacion > 0) {
             bytes_enviados += verificacion;
         } else {
-            printf("Error: %s\n", strerror(errno));
             hubo_un_error = true;
         }
     }
@@ -127,30 +131,27 @@ int socket_enviar(socket_t* self, const char* mensaje, size_t tamanio){
     return EXITO;
 }
 
-int socket_recibir(socket_t* self,
-                   char* mensaje,
-                   size_t tamanio,
-                   socket_callback_t callback,
-                   void* callback_3){
+int socket_recibir(socket_t* self, char* mensaje, size_t tamanio,
+                   socket_callback_t callback, void* callback_3){
+    int verificacion = 0;
     bool hubo_un_error = false;
     int bytes_recibidos = 0;
     bool se_cerro_el_socket = false;
     while (hubo_un_error == false && se_cerro_el_socket == false) {
-        int verificacion = recv(self->file_descriptor,&mensaje[bytes_recibidos],
-                                (tamanio - bytes_recibidos - 1), 0);
+        verificacion = recv(self->file_descriptor,&mensaje[bytes_recibidos],
+                                (tamanio - bytes_recibidos-1), 0);
         if (verificacion == -1) {
-            printf("Error: %s\n", strerror(errno));
             hubo_un_error = true;
         } else if (verificacion == 0) {
             se_cerro_el_socket = true;
         } else {
+            if (verificacion<tamanio)
             bytes_recibidos += verificacion;
-            callback(callback_3, mensaje);
+            callback(callback_3, mensaje, bytes_recibidos);
             mensaje[bytes_recibidos] = '\0';
             fwrite(mensaje, 1, bytes_recibidos, stdout);
             bytes_recibidos = 0;
         }
-        printf("\n");
       }
       if (hubo_un_error) {
           return ERROR;
@@ -158,7 +159,6 @@ int socket_recibir(socket_t* self,
           return EXITO;
       }
 }
-
 void socket_destruir(socket_t* self){
     if (self->file_descriptor > 0){
         shutdown(self->file_descriptor, SHUT_RDWR);
