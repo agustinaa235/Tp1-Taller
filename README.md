@@ -45,7 +45,7 @@ Este se encarga de hacer su cifrado. Tanto para la encriptacion como desencripta
     Este tda se guardar la la key, el vector de key_stream en donde lo inicializa por unica vez en la funcion de inicializacion de este tda y se guarda las refencias de i y j que afectarian en el rc4 prga. Esto se hace por el mismo motivo que mencione antes con el tda de vigenere con respecto a la desencriptacion.
 
 
-# Deciciones de implementacion
+# Decisiones de implementacion
 
 Para la parte de encriptacion del lado del cliente, se decido que una vez leeido el mensaje de la entrada estandar se encripte y se envie el mensaje y como leemos de a 64 bytes eso lo hacemos dentro de la iteracion de lectora. Es por eso que la funcion de lector_iteral recibe dos punteros a funciones o como se puso en el tp dos callbacks donde uno es para el encriptar mensaje y recibe encapsulado al enciptador y el otro es para el mandar mensaje donde se recibe el socket. Esto se deicico asi para locarg mayor encapsulamiento y que si el dia de manana tenemos que cambiar ese callback por otro solo tendriamos que cambiar la firma de la funcion.
 
