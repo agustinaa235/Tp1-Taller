@@ -9,7 +9,8 @@ typedef struct cesar {
 
 int cesar_inicializar(cesar_t* self, char* key);
 
-int cesar_cifrado(cesar_t* self, unsigned char* mensaje, int tamanio, int formato);
+int cesar_cifrado(cesar_t* self, unsigned char* mensaje, int tamanio,
+                  int formato);
 
 int cesar_destruir(cesar_t* self);
 

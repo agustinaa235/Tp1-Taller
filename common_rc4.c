@@ -10,14 +10,13 @@ void swap(unsigned char* key_stream, int j, int k) {
     key_stream[k] = aux;
 }
 
-void rc4_ksa(char* key){
+unsigned char* rc4_ksa(char* key, unsigned char key_stream[TAMANIO_VECTOR_KS]){
     int j = 0;
-    unsigned char key_stream[TAMANIO_VECTOR_KS];
     for (int i = 0; i < (TAMANIO_VECTOR_KS); i++){
         key_stream[i] = i;
     }
     for (int x = 0; x < (TAMANIO_VECTOR_KS); x++) {
-        j = (j + key[x % tamanio_key] + s_box[x])%TAMANIO_VECTOR_KS;
+        j = (j + key[x % strlen(key)] + key_stream[x])%TAMANIO_VECTOR_KS;
         swap(key_stream, x, j);
     }
     return key_stream;
@@ -25,7 +24,7 @@ void rc4_ksa(char* key){
 
 int rc4_inicializar(rc4_t* self, char* key){
     self->key = key;
-    self->key_stream = rc3_ksa(key)
+    rc4_ksa(key, self->key_stream);
     self->pos_j = 0;
     self->pos_k = 0;
     return EXITO;
@@ -42,11 +41,10 @@ unsigned char rc4_prga(unsigned char* key_stream, int* j, int* k) {
 int rc4_cifrado(rc4_t* self, unsigned char* mensaje, int tamanio, int formato){
     int i = 0;
     while (i< tamanio){
-        mensaje[i] = mensaje[i]^rc4_prga(self->key_stream, self->pos_j, self->pos_k);
-        printf("| %x|", (int)mensaje[i]);
+        mensaje[i] = mensaje[i]^rc4_prga(self->key_stream, &self->pos_j,
+                                         &self->pos_k);
         i++;
     }
-    printf("\n");
     return EXITO;
 }
 

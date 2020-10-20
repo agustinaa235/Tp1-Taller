@@ -1,6 +1,7 @@
 #include "common_cesar.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #define TAMANIO_ASCCI 256
 #define EXITO 0
@@ -11,7 +12,8 @@ int cesar_inicializar(cesar_t* self, char* key){
     return EXITO;
 }
 
-int cesar_cifrado(cesar_t* self, unsigned char* mensaje, int tamanio, int formato){
+int cesar_cifrado(cesar_t* self, unsigned char* mensaje, int tamanio,
+                  int formato){
     int key_aux = 0;
     key_aux = atoi(self->key);
     int i = 0;

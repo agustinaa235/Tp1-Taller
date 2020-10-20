@@ -2,6 +2,7 @@
 #include "common_cesar.h"
 #include "common_vigenere.h"
 #include "common_rc4.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -12,7 +13,7 @@
 #define RC4 "rc4"
 
 
-int encriptador_inicializar(encriptador_t *self, const char* funcion,
+int encriptador_inicializar(encriptador_t *self, char* funcion,
                             void* tipo_de_encriptador){
     self->funcion = funcion;
     self->tipo_de_encriptador = tipo_de_encriptador;
@@ -22,13 +23,13 @@ int encriptador_inicializar(encriptador_t *self, const char* funcion,
 int encriptador_verificar_encriptacion(encriptador_t* self,
                                        unsigned char* mensaje, int tamanio,
                                        int formato){
-    if(strcmp(self->funcion, CESAR)==0){
+    if (strcmp(self->funcion, CESAR) == 0){
         return cesar_cifrado((cesar_t*)self->tipo_de_encriptador, mensaje,
                               tamanio, formato);
-    }else if( strcmp(self->funcion, VIGENERE)==0){
+    } else if (strcmp(self->funcion, VIGENERE) == 0){
         return vigenere_cifrado((vigenere_t*)self->tipo_de_encriptador, mensaje,
                                  tamanio, formato);
-    }else if (strcmp(self->funcion, RC4) == 0){
+    } else if (strcmp(self->funcion, RC4) == 0){
         return rc4_cifrado((rc4_t*)self->tipo_de_encriptador,mensaje, tamanio,
                             formato);
     } else {

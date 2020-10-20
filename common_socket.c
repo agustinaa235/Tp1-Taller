@@ -16,6 +16,8 @@
 #define ESCUCHA_POR_CONEXIONES 5
 #define ERROR 1
 #define EXITO 0
+#define FALLA_SOCKET -1
+#define EXITO_GET_ADD_INFO 0
 
 
 int socket_inicializar(socket_t* self){
@@ -26,27 +28,25 @@ int socket_inicializar(socket_t* self){
 int socket_bine_and_listen(socket_t* self,
                            const char* host,
                            const char* service){
-      int verificacion = 0;
       bool no_pude_binear = true;
-      struct addrinfo hints;
-      struct addrinfo *resultado, *rp;
+      struct addrinfo hints, *resultado, *rp;
       memset(&hints, 0, sizeof(struct addrinfo));
       hints.ai_family = AF_INET;
       hints.ai_socktype = SOCK_STREAM;
       hints.ai_flags = AI_PASSIVE;
-
-      verificacion = getaddrinfo(host, service, &hints, &resultado);
-      if (verificacion != 0){
+      if (getaddrinfo(host, service, &hints, &resultado) != EXITO_GET_ADD_INFO){
           return ERROR;
       }
       rp = resultado;
       while (rp != NULL && no_pude_binear){
           int file_descriptor = socket(rp->ai_family, rp->ai_socktype,
                                        rp->ai_protocol);
-          if (file_descriptor == -1){
+          if (file_descriptor == FALLA_SOCKET){
+              no_pude_binear = true;
           } else {
-              if (bind(file_descriptor, rp->ai_addr, rp->ai_addrlen) == -1){
+              if (bind(file_descriptor, rp->ai_addr, rp->ai_addrlen) == FALLA_SOCKET){
                   close(file_descriptor);
+                  no_pude_binear = true;
               } else {
                   no_pude_binear = false;
                   self->file_descriptor = file_descriptor;
@@ -55,19 +55,21 @@ int socket_bine_and_listen(socket_t* self,
           rp = rp->ai_next;
       }
       if (no_pude_binear){
-          return ERROR; // no nos pudimos concetar a nnguna dirreccion
+          return ERROR;
       }
       freeaddrinfo(resultado);
-      verificacion = listen(self->file_descriptor, ESCUCHA_POR_CONEXIONES);
-      if (verificacion != 0){
+      if(listen(self->file_descriptor, ESCUCHA_POR_CONEXIONES) == FALLA_SOCKET){
           return ERROR;
       }
       return EXITO;
 }
 
 int socket_acceptar(socket_t* listener, socket_t* peer){
+      if (listener->file_descriptor == FALLA_SOCKET){
+          return ERROR;
+      }
       peer->file_descriptor = accept(listener->file_descriptor, NULL, NULL);
-      if (peer->file_descriptor == -1){
+      if (peer->file_descriptor == FALLA_SOCKET){
           close(listener->file_descriptor);
           return ERROR;
       }
@@ -75,43 +77,42 @@ int socket_acceptar(socket_t* listener, socket_t* peer){
 }
 
 int socket_conectar(socket_t* self, const char* host, const char* service){
-    bool no_conectado = true;
-    struct addrinfo hints;
-    struct addrinfo *resultado, *aux;
+    bool no_hubo_conexion = true;
+    struct addrinfo hints, *resultado, *aux;
     memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_INET;       /* IPv4 (or AF_INET6 for IPv6)     */
-    hints.ai_socktype = SOCK_STREAM; /* TCP  (or SOCK_DGRAM for UDP)    */
-    hints.ai_flags = 0;              /* None (or AI_PASSIVE for server) */
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = 0;
 
-    if (getaddrinfo(host, service, &hints, &resultado) != 0){
+    if (getaddrinfo(host, service, &hints, &resultado) != EXITO_GET_ADD_INFO){
         return ERROR;
     }
     aux = resultado;
-    while (aux != NULL && no_conectado){
+    while (aux != NULL && no_hubo_conexion){
         int file_descriptor = socket(aux->ai_family, aux->ai_socktype,
                                      aux->ai_protocol);
-        if (file_descriptor < 0){
-            no_conectado = true;
+        if (file_descriptor == FALLA_SOCKET){
+            no_hubo_conexion = true;
         } else {
-            if (connect(file_descriptor,aux->ai_addr,aux->ai_addrlen)== -1){
+            if (connect(file_descriptor,aux->ai_addr,aux->ai_addrlen) == FALLA_SOCKET){
                 close(file_descriptor);
+                no_hubo_conexion = true;
             } else {
-                no_conectado = false;
+                no_hubo_conexion = false;
                 self->file_descriptor = file_descriptor;
             }
         }
         aux = aux->ai_next;
     }
     freeaddrinfo(resultado);
-    if (no_conectado == true){
-        return ERROR; // no nos pudimos concetar a nnguna dirreccion
+    if (no_hubo_conexion){
+        return ERROR;
     }
     return EXITO;
 }
 
 int socket_enviar(socket_t* self, const char* mensaje, size_t tamanio){
-    if (self->file_descriptor < 0){
-        socket_destruir(self);
+    if (self->file_descriptor == FALLA_SOCKET){
         return ERROR;
     }
     int bytes_enviados = 0;
@@ -133,12 +134,14 @@ int socket_enviar(socket_t* self, const char* mensaje, size_t tamanio){
 
 int socket_recibir(socket_t* self, char* mensaje, size_t tamanio,
                    socket_callback_t callback, void* callback_3){
-    int verificacion = 0;
+    if (self->file_descriptor == FALLA_SOCKET){
+          return ERROR;
+    }
     bool hubo_un_error = false;
     int bytes_recibidos = 0;
     bool se_cerro_el_socket = false;
     while (hubo_un_error == false && se_cerro_el_socket == false) {
-        verificacion = recv(self->file_descriptor,&mensaje[bytes_recibidos],
+        int verificacion = recv(self->file_descriptor,&mensaje[bytes_recibidos],
                                 (tamanio - bytes_recibidos-1), 0);
         if (verificacion == -1) {
             hubo_un_error = true;
