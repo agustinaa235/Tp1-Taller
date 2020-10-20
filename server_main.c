@@ -23,7 +23,7 @@ static void desencriptar_mensaje(void* callback_2, const char* mensaje,
     encriptador_desencriptar(encriptador, (unsigned char*)mensaje, tamanio);
 }
 
-void inicializar_informacion(char* argv[], char service[TAMANIO_MAXIMO],
+static void inicializar_informacion(char* argv[], char service[TAMANIO_MAXIMO],
                              char funcion[TAMANIO_MAXIMO],
                              char key[TAMANIO_MAXIMO]){
     strncpy(service, argv[1], TAMANIO_MAXIMO);
@@ -52,7 +52,7 @@ int verificar_funcion(encriptador_t* encriptador, char* key, char* funcion,
         return ERROR;
     }
 }
-void mensaje_error_argumentos(){
+ static void mensaje_error_argumentos(){
     printf(" La cantidad de argumentos ingresados no es valida, deben ser 4\n");
     printf(" Ejemplo de argumentos ./server 8080 --metodo=cesar --key=4\n");
 }
@@ -83,11 +83,9 @@ int main(int argc, char *argv[]){
     socket_acceptar(&socket,&peer);
     socket_recibir(&peer,respuesta,TAMANIO_VECTOR,desencriptar_mensaje,
                    &encriptador);
+
     socket_destruir(&peer);
     socket_destruir(&socket);
-    rc4_destruir(&rc4);
-    vigenere_destruir(&vigenere);
-    cesar_destruir(&cesar);
     encriptador_destruir(&encriptador);
 
     return 0;

@@ -46,6 +46,19 @@ int encriptador_desencriptar(encriptador_t* self, unsigned char* mensaje,
       return encriptador_verificar_encriptacion(self, mensaje, tamanio, -1);
 }
 
+int destruir_tipo_de_encriptador(encriptador_t* self){
+
+    if (strcmp(self->funcion, CESAR) == 0){
+        return cesar_destruir(self->tipo_de_encriptador);
+    } else if (strcmp(self->funcion, VIGENERE) == 0){
+        return vigenere_destruir(self->tipo_de_encriptador);
+    } else if (strcmp(self->funcion, RC4) == 0){
+        return rc4_destruir(self->tipo_de_encriptador);
+    } else {
+        return ERROR;
+    }
+}
+
 int encriptador_destruir(encriptador_t* self){
-    return EXITO;
+    return destruir_tipo_de_encriptador(self);
 }

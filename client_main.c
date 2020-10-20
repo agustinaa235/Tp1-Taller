@@ -30,7 +30,7 @@ static void encriptar_mensaje(void* callback_2, const char* mensaje,
     encriptador_t* encriptador = callback_2;
     encriptador_encriptar(encriptador, (unsigned char*)mensaje, cant_leidos);
 }
-void inicializar_informacion(char* argv[], char host[TAMANIO_MAXIMO],
+static void inicializar_informacion(char* argv[], char host[TAMANIO_MAXIMO],
                              char service[TAMANIO_MAXIMO],
                              char funcion[TAMANIO_MAXIMO],
                              char key[TAMANIO_MAXIMO]){
@@ -60,7 +60,7 @@ int verificar_funcion(encriptador_t* encriptador, char* key, char* funcion,
         return ERROR;
     }
 }
-void mensaje_error_argumentos(){
+static void mensaje_error_argumentos(){
     printf(" La cantidad de argumentos ingresados no es valida, deben ser 5\n");
     printf(" Ejemplo de argumentos ./client 127.0.0.1 8080 --metodo=cesar");
     printf(" --key-4 < client_archivo\n");
@@ -86,7 +86,6 @@ int main(int argc, char *argv[]){
                           &rc4) == ERROR){
         return 0;
     }
-
     lector_inicializar(&lector, NULL);
     socket_inicializar(&socket);
     if (socket_conectar(&socket, host, service) == EXITO){;
@@ -96,8 +95,5 @@ int main(int argc, char *argv[]){
     socket_destruir(&socket);
     lector_destruir(&lector);
     encriptador_destruir(&encriptador);
-    rc4_destruir(&rc4);
-    vigenere_destruir(&vigenere);
-    cesar_destruir(&cesar);
     return 0;
 }
