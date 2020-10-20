@@ -3,6 +3,7 @@
 # Informacion Estudiante
 
 Nombre: Agustina segura
+
 Padron: 10422
 
 # Intruccion
@@ -10,9 +11,9 @@ Padron: 10422
 El tp consta de de dos programas ( un cliente y un servidor) en donde el cliente recibe mensajes de entrada estandar, luego estos mensajes son encriptados y envaidos al servidor donde este cuando los recibe los desencripta y los muestra por salida estandar. Los cifrados de este tp fueron: cesar, vigenere y rc4.
 
 
-# Disenio del tp
+# Diseño del tp
 
-El disenio consta de dos programas generales donde en uno se modela a un cliente y en el otro a un servidor, en la cual el cliente va a enviarle mensajes al servidor.
+El diseño consta de dos programas generales donde en uno se modela a un cliente y en el otro a un servidor, en la cual el cliente va a enviarle mensajes al servidor.
 En el tp se decidio modelar los distintos tdas:
 
 * socket
@@ -56,5 +57,6 @@ A su vez se hace otra verificacion de lo mismo cuando se invoca a encriptador en
 # Digramas
 
 ![digrama encriptador_t con sus tipos de encriptadores](https://github.com/agustinaa235/Tp1/blob/main/encriptadores.png)
+
 
 ![digrama con callbacks](https://github.com/agustinaa235/Tp1/blob/main/callbacks.png)
