@@ -37,7 +37,7 @@ Este se encarga de hacer su cifrado. Tanto para la encriptacion como desencripta
 
 * Vigenere
 
-      Este tda necesitaba guardarse ademas de la key, una referencia a la posicion de la key. Esto fue porque como se encripta de a partes(64 bytes) dependiendo del largo del archivo, el mensaje puede o no entrar en los 64 bytes por lo que para poder desencriptar "todo de una vez" tuvimos que guardarnos la refencia a la posicion de la key.
+    Este tda necesitaba guardarse ademas de la key, una referencia a la posicion de la key. Esto fue porque como se encripta de a partes(64 bytes) dependiendo del largo del archivo, el mensaje puede o no entrar en los 64 bytes por lo que para poder desencriptar "todo de una vez" tuvimos que guardarnos la refencia a la posicion de la key.
 
 * RC4
 
@@ -51,4 +51,4 @@ Para la parte de encriptacion del lado del cliente, se decido que una vez leeido
 Para la parte del recibir en el tda socket tambien se recibe un puntero a funcion. En este caso se recibe la funcion de desencriptar mensaje y recibe al encriptador. Esto se hizo asi ya que como no sabemos el tamanio del mensaje que es recibido, la unica forma de imprimir todo el mensaje completo es o declaranado un buffer muy grande o pidiendo memoria. Es por eso que se decidio ir decodiifcando e imprimiento dentro de la funcion recibir asi evitamos pedir memoria.
 
 En los dos programas se tiene implemnetado una funcion de verificacion de funcion, en la cual se verifica que tipo de cifrado se quiere utilizar para luego crear al encriptador generico con su cifrado correspondiente. Esto se hizo asi para luego poder delegar a al tipo de encritador.
-A su vez se hace otra verificacion de lo mismo cuando se invoca a encriptador encriptar o encriptador desencriptar para poder saber de que cifrado se trata e invocar al correcto con su correspiende formato.     
+A su vez se hace otra verificacion de lo mismo cuando se invoca a encriptador encriptar o encriptador desencriptar para poder saber de que cifrado se trata e invocar al correcto con su correspiende formato.

@@ -47,7 +47,6 @@ int encriptador_desencriptar(encriptador_t* self, unsigned char* mensaje,
 }
 
 int destruir_tipo_de_encriptador(encriptador_t* self){
-
     if (strcmp(self->funcion, CESAR) == 0){
         return cesar_destruir(self->tipo_de_encriptador);
     } else if (strcmp(self->funcion, VIGENERE) == 0){
