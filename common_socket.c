@@ -35,31 +35,30 @@ void inicializar_struct_hints(struct addrinfo* hints, int ai_family,
 int socket_bine_and_listen(socket_t* self,
                            const char* host,
                            const char* service){
-      bool no_pude_binear = true;
+      bool hubo_un_error = false;
       struct addrinfo hints, *resultado, *rp;
       inicializar_struct_hints(&hints,AF_INET, SOCK_STREAM, AI_PASSIVE);
       if (getaddrinfo(host, service, &hints, &resultado) != EXITO_GET_ADD_INFO){
           return ERROR;
       }
       rp = resultado;
-      while (rp != NULL && no_pude_binear){
+      while (rp != NULL && hubo_un_error == false){
           int file_descriptor = socket(rp->ai_family, rp->ai_socktype,
                                        rp->ai_protocol);
           if (file_descriptor == FALLA_SOCKET){
-              no_pude_binear = true;
+              hubo_un_error = true;
           } else {
               if (bind(file_descriptor, rp->ai_addr, rp->ai_addrlen)
                         == FALLA_SOCKET){
                   close(file_descriptor);
-                  no_pude_binear = true;
+                  hubo_un_error = true;
               } else {
-                  no_pude_binear = false;
                   self->file_descriptor = file_descriptor;
               }
           }
           rp = rp->ai_next;
       }
-      if (no_pude_binear){
+      if (hubo_un_error){
           return ERROR;
       }
       freeaddrinfo(resultado);
@@ -82,32 +81,31 @@ int socket_acceptar(socket_t* listener, socket_t* peer){
 }
 
 int socket_conectar(socket_t* self, const char* host, const char* service){
-    bool no_hubo_conexion = true;
+    bool hubo_un_error = false;
     struct addrinfo hints, *resultado, *aux;
     inicializar_struct_hints(&hints,AF_INET, SOCK_STREAM, 0);
     if (getaddrinfo(host, service, &hints, &resultado) != EXITO_GET_ADD_INFO){
         return ERROR;
     }
     aux = resultado;
-    while (aux != NULL && no_hubo_conexion){
+    while (aux != NULL && hubo_un_error == false){
         int file_descriptor = socket(aux->ai_family, aux->ai_socktype,
                                      aux->ai_protocol);
         if (file_descriptor == FALLA_SOCKET){
-            no_hubo_conexion = true;
+            hubo_un_error = true;
         } else {
             if (connect(file_descriptor,aux->ai_addr,aux->ai_addrlen)
                         == FALLA_SOCKET){
                 close(file_descriptor);
-                no_hubo_conexion = true;
+                hubo_un_error = true;
             } else {
-                no_hubo_conexion = false;
                 self->file_descriptor = file_descriptor;
             }
         }
         aux = aux->ai_next;
     }
     freeaddrinfo(resultado);
-    if (no_hubo_conexion){
+    if (hubo_un_error){
         return ERROR;
     }
     return EXITO;
