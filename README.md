@@ -52,3 +52,9 @@ Para la parte del recibir en el tda socket tambien se recibe un puntero a funcio
 
 En los dos programas se tiene implemnetado una funcion de verificacion de funcion, en la cual se verifica que tipo de cifrado se quiere utilizar para luego crear al encriptador generico con su cifrado correspondiente. Esto se hizo asi para luego poder delegar a al tipo de encritador.
 A su vez se hace otra verificacion de lo mismo cuando se invoca a encriptador encriptar o encriptador desencriptar para poder saber de que cifrado se trata e invocar al correcto con su correspiende formato.
+
+# Digramas
+
+![digrama encriptador_t con sus tipos de encriptadores](https://github.com/agustinaa235/Tp1/blob/master/encriptadores.png)
+
+![digrama con callbacks](https://github.com/agustinaa235/tp0/blob/master/callbacks.png)
