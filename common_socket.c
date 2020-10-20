@@ -13,7 +13,7 @@
 #include <netdb.h>
 #include <unistd.h>
 
-#define ESCUCHA_POR_CONEXIONES 5
+#define ESCUCHA 5
 #define ERROR 1
 #define EXITO 0
 #define FALLA_SOCKET -1
@@ -44,7 +44,8 @@ int socket_bine_and_listen(socket_t* self,
           if (file_descriptor == FALLA_SOCKET){
               no_pude_binear = true;
           } else {
-              if (bind(file_descriptor, rp->ai_addr, rp->ai_addrlen) == FALLA_SOCKET){
+              if (bind(file_descriptor, rp->ai_addr, rp->ai_addrlen)
+                        == FALLA_SOCKET){
                   close(file_descriptor);
                   no_pude_binear = true;
               } else {
@@ -58,7 +59,7 @@ int socket_bine_and_listen(socket_t* self,
           return ERROR;
       }
       freeaddrinfo(resultado);
-      if(listen(self->file_descriptor, ESCUCHA_POR_CONEXIONES) == FALLA_SOCKET){
+      if (listen(self->file_descriptor, ESCUCHA) == FALLA_SOCKET){
           return ERROR;
       }
       return EXITO;
@@ -94,7 +95,8 @@ int socket_conectar(socket_t* self, const char* host, const char* service){
         if (file_descriptor == FALLA_SOCKET){
             no_hubo_conexion = true;
         } else {
-            if (connect(file_descriptor,aux->ai_addr,aux->ai_addrlen) == FALLA_SOCKET){
+            if (connect(file_descriptor,aux->ai_addr,aux->ai_addrlen)
+                        == FALLA_SOCKET){
                 close(file_descriptor);
                 no_hubo_conexion = true;
             } else {

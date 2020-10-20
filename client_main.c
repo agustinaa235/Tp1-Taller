@@ -67,7 +67,7 @@ void mensaje_error_argumentos(){
 }
 
 int main(int argc, char *argv[]){
-    if(argc != CANTIDAD_ARGUMENTOS){
+    if (argc != CANTIDAD_ARGUMENTOS){
         mensaje_error_argumentos();
         return 0;
     }

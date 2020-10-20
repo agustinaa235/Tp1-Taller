@@ -7,7 +7,7 @@
 int lector_inicializar(lector_t* self, const char* file_nombre){
     if (file_nombre){
         self->file = fopen(file_nombre, "rb");
-        if(!self->file){
+        if (!self->file){
             return ERROR;
         }
     } else {
@@ -25,14 +25,14 @@ int lector_iterar(lector_t* self,
     char mensaje[MENSAJE_TAMANIO] = "";
     while (!feof(self->file) && !hubo_un_error){
         size_t cant_leidos = fread(mensaje, 1, MENSAJE_TAMANIO, self->file);
-        if (cant_leidos>0){
+        if (cant_leidos > 0){
             callback2(callback_2, mensaje, cant_leidos);
             callback(mensaje, cant_leidos, callback_ctx);
         } else {
             hubo_un_error = true;
         }
     }
-    if(hubo_un_error){
+    if (hubo_un_error){
         return ERROR;
     }
     return EXITO;

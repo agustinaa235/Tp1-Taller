@@ -26,13 +26,11 @@ static void desencriptar_mensaje(void* callback_2, const char* mensaje,
 void inicializar_informacion(char* argv[], char service[TAMANIO_MAXIMO],
                              char funcion[TAMANIO_MAXIMO],
                              char key[TAMANIO_MAXIMO]){
-
     strncpy(service, argv[1], TAMANIO_MAXIMO);
     const char *key_ingresada = (argv[3] + 6);
     strncpy(key, key_ingresada, TAMANIO_MAXIMO);
     const char* funcion_ingresada = (argv[2] + 9);
     strncpy(funcion, funcion_ingresada, TAMANIO_MAXIMO);
-
 }
 
 int verificar_funcion(encriptador_t* encriptador, char* key, char* funcion,
@@ -78,7 +76,7 @@ int main(int argc, char *argv[]){
     if (verificar_funcion(&encriptador, key, funcion, &cesar, &vigenere,
                           &rc4) == ERROR){
         return 0;
-    };
+    }
     socket_inicializar(&socket);
     socket_inicializar(&peer);
     socket_bine_and_listen(&socket, NULL, service);

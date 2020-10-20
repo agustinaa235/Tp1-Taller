@@ -49,5 +49,5 @@ int rc4_cifrado(rc4_t* self, unsigned char* mensaje, int tamanio, int formato){
 }
 
 int rc4_destruir(rc4_t* self){
-    return 0;
+    return EXITO;
 }
