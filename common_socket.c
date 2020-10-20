@@ -24,16 +24,20 @@ int socket_inicializar(socket_t* self){
     self->file_descriptor = -1;
     return EXITO;
 }
+void inicializar_struct_hints(struct addrinfo* hints, int ai_family,
+                              int ai_socktype, int ai_flags){
+      memset(hints, 0, sizeof(struct addrinfo));
+      hints->ai_family = ai_family;
+      hints->ai_socktype = ai_socktype;
+      hints->ai_flags = ai_flags;
+}
 
 int socket_bine_and_listen(socket_t* self,
                            const char* host,
                            const char* service){
       bool no_pude_binear = true;
       struct addrinfo hints, *resultado, *rp;
-      memset(&hints, 0, sizeof(struct addrinfo));
-      hints.ai_family = AF_INET;
-      hints.ai_socktype = SOCK_STREAM;
-      hints.ai_flags = AI_PASSIVE;
+      inicializar_struct_hints(&hints,AF_INET, SOCK_STREAM, AI_PASSIVE);
       if (getaddrinfo(host, service, &hints, &resultado) != EXITO_GET_ADD_INFO){
           return ERROR;
       }
@@ -80,11 +84,7 @@ int socket_acceptar(socket_t* listener, socket_t* peer){
 int socket_conectar(socket_t* self, const char* host, const char* service){
     bool no_hubo_conexion = true;
     struct addrinfo hints, *resultado, *aux;
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = 0;
-
+    inicializar_struct_hints(&hints,AF_INET, SOCK_STREAM, 0);
     if (getaddrinfo(host, service, &hints, &resultado) != EXITO_GET_ADD_INFO){
         return ERROR;
     }
@@ -150,7 +150,6 @@ int socket_recibir(socket_t* self, char* mensaje, size_t tamanio,
         } else if (verificacion == 0) {
             se_cerro_el_socket = true;
         } else {
-            if (verificacion<tamanio)
             bytes_recibidos += verificacion;
             callback(callback_3, mensaje, bytes_recibidos);
             mensaje[bytes_recibidos] = '\0';
