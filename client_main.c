@@ -30,6 +30,7 @@ static void encriptar_mensaje(void* callback_2, const char* mensaje,
     encriptador_t* encriptador = callback_2;
     encriptador_encriptar(encriptador, (unsigned char*)mensaje, cant_leidos);
 }
+
 static void inicializar_informacion(char* argv[], char host[TAMANIO_MAXIMO],
                              char service[TAMANIO_MAXIMO],
                              char funcion[TAMANIO_MAXIMO],
@@ -41,6 +42,7 @@ static void inicializar_informacion(char* argv[], char host[TAMANIO_MAXIMO],
     const char* funcion_entrada = (argv[3] + 9);
     strncpy(funcion, funcion_entrada, TAMANIO_MAXIMO);
 }
+
 int verificar_funcion(encriptador_t* encriptador, char* key, char* funcion,
                        cesar_t* cesar, vigenere_t* vigenere, rc4_t* rc4){
     if (strcmp(funcion, CESAR) == 0){
@@ -60,6 +62,7 @@ int verificar_funcion(encriptador_t* encriptador, char* key, char* funcion,
         return ERROR;
     }
 }
+
 static void mensaje_error_argumentos(){
     printf(" La cantidad de argumentos ingresados no es valida, deben ser 5\n");
     printf(" Ejemplo de argumentos ./client 127.0.0.1 8080 --metodo=cesar");

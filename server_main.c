@@ -17,9 +17,9 @@
 #define CANTIDAD_ARGUMENTOS 4
 
 
-static void desencriptar_mensaje(void* callback_2, const char* mensaje,
+static void desencriptar_mensaje(void* callback_3, const char* mensaje,
                                  int tamanio){
-    encriptador_t* encriptador = callback_2;
+    encriptador_t* encriptador = callback_3;
     encriptador_desencriptar(encriptador, (unsigned char*)mensaje, tamanio);
 }
 
