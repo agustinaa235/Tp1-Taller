@@ -33,6 +33,34 @@ void inicializar_struct_hints(struct addrinfo* hints, int ai_family,
       hints->ai_flags = ai_flags;
 }
 
+int bine_aux(int file_descriptor, struct addrinfo* rp){
+    return bind(file_descriptor, rp->ai_addr, rp->ai_addrlen);
+}
+int connect_aux(int file_descriptor, struct addrinfo* rp){
+    return connect(file_descriptor, rp->ai_addr, rp->ai_addrlen);
+}
+bool bine_connect(socket_t* self, struct addrinfo* rp,
+                  int (*funcion)(int, struct addrinfo* )){
+    bool hubo_un_error = true;
+    while (rp != NULL && hubo_un_error){
+        int file_descriptor = socket(rp->ai_family, rp->ai_socktype,
+                                   rp->ai_protocol);
+        if (file_descriptor == FALLA_SOCKET){
+            hubo_un_error = true;
+        } else {
+            if (funcion(file_descriptor, rp) == FALLA_SOCKET){
+                close(file_descriptor);
+                hubo_un_error = true;
+            } else {
+                hubo_un_error = false;
+                self->file_descriptor = file_descriptor;
+            }
+        }
+        rp = rp->ai_next;
+    }
+    return hubo_un_error;
+}
+
 int socket_bine_and_listen(socket_t* self,
                            const char* host,
                            const char* service){
@@ -43,23 +71,7 @@ int socket_bine_and_listen(socket_t* self,
           return ERROR;
       }
       rp = resultado;
-      while (rp != NULL && no_pude_binear){
-          int file_descriptor = socket(rp->ai_family, rp->ai_socktype,
-                                       rp->ai_protocol);
-          if (file_descriptor == FALLA_SOCKET){
-              no_pude_binear = true;
-          } else {
-              if (bind(file_descriptor, rp->ai_addr, rp->ai_addrlen)
-                        == FALLA_SOCKET){
-                  close(file_descriptor);
-                  no_pude_binear = true;
-              } else {
-                  no_pude_binear = false;
-                  self->file_descriptor = file_descriptor;
-              }
-          }
-          rp = rp->ai_next;
-      }
+      no_pude_binear = bine_connect(self, rp, bine_aux);
       if (no_pude_binear){
           return ERROR;
       }
@@ -90,23 +102,7 @@ int socket_conectar(socket_t* self, const char* host, const char* service){
         return ERROR;
     }
     aux = resultado;
-    while (aux != NULL && no_hubo_conexion){
-        int file_descriptor = socket(aux->ai_family, aux->ai_socktype,
-                                     aux->ai_protocol);
-        if (file_descriptor == FALLA_SOCKET){
-            no_hubo_conexion = true;
-        } else {
-            if (connect(file_descriptor,aux->ai_addr,aux->ai_addrlen)
-                        == FALLA_SOCKET){
-                close(file_descriptor);
-                no_hubo_conexion = true;
-            } else {
-                no_hubo_conexion = false;
-                self->file_descriptor = file_descriptor;
-            }
-        }
-        aux = aux->ai_next;
-    }
+    no_hubo_conexion = bine_connect(self, aux, connect_aux);
     freeaddrinfo(resultado);
     if (no_hubo_conexion){
         return ERROR;
