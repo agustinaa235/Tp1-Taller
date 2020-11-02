@@ -5,8 +5,9 @@
 #include <stdint.h>
 #include <netdb.h>
 
-typedef void (*socket_callback_t)(void* callback_3, const char* mensaje,
-                                  int tamanio);
+typedef void (*socket_desencriptacion_t)(void* callback_encriptador,
+                                          const char* mensaje,
+                                          int tamanio);
 
 typedef struct socket {
    int file_descriptor;
@@ -45,11 +46,10 @@ int socket_enviar(socket_t* self, const char* mensaje, size_t tamanio);
   * recibira el mensaje, lo desencriptara y lo imprimira por salida estandar
   * si falla algo devolvera error sino devolvera exito
 */
-int socket_recibir(socket_t* self, char* mensaje, size_t tamanio,
-                   socket_callback_t callback, void* callback_3);
+int socket_recibir(socket_t* self, char* mensaje, size_t tamanio);
 /*
   * destruirra la estrcutura haciendo un shoutdown y luego un close
-*/  
+*/
 void socket_destruir(socket_t* self);
 
 #endif

@@ -19,8 +19,11 @@ int encriptador_inicializar(encriptador_t *self, char* funcion,
     self->tipo_de_encriptador = tipo_de_encriptador;
     return EXITO;
 }
-
-int encriptador_verificar_encriptacion(encriptador_t* self,
+/*
+  * esta funcion que tipo de enctiptador se trata para poder realizar el
+  *cifrado correspondiente.
+*/
+static int encriptador_verificar_encriptacion(encriptador_t* self,
                                        unsigned char* mensaje, int tamanio,
                                        int formato){
     if (strcmp(self->funcion, CESAR) == 0){
@@ -45,8 +48,11 @@ int encriptador_desencriptar(encriptador_t* self, unsigned char* mensaje,
                              int tamanio){
       return encriptador_verificar_encriptacion(self, mensaje, tamanio, -1);
 }
-
-int destruir_tipo_de_encriptador(encriptador_t* self){
+/*
+  * esta funcion se encarga de verificar el tipo de encriptador que
+  * tiene guardado para poder liberarlo correctamente
+*/
+static int destruir_tipo_de_encriptador(encriptador_t* self){
     if (strcmp(self->funcion, CESAR) == 0){
         return cesar_destruir(self->tipo_de_encriptador);
     } else if (strcmp(self->funcion, VIGENERE) == 0){

@@ -8,11 +8,12 @@ typedef struct lector {
       FILE* file;
 }lector_t;
 
-typedef void (*lector_callback_t)(const char* mensaje,
-                                  int tamanio_mensaje,
-                                  void* callback_ctx);
-typedef void (*lector_callback2_t)(void* callback_2, const char* mensaje,
-                                   int cant_leidos);
+typedef void (*lector_encriptacion_t)(void* callback_encriptador,
+                                      const char* mensaje,
+                                      int tamanio_mensaje);
+typedef void (*lector_enviar_mensaje_t)(const char* mensaje,
+                                        int cant_leidos,
+                                        void* callback_enviador);
 /*
   *inicializara la estructura defandola valida
     * si el file nombre es null toma el de entrada estandar
@@ -24,9 +25,9 @@ int lector_inicializar(lector_t* self, const char* file_nombre);
   * si falla fread devuelve error sino devuelve exito
 */
 int lector_iterar(lector_t* self,
-                  lector_callback_t callback,
-                  lector_callback2_t callback2,
-                  void* callback_ctx, void* callback_2);
+                  lector_encriptacion_t encriptacion,
+                  lector_enviar_mensaje_t enviar,
+                  void* callbakc_encriptador, void* callback_enviador);
 /*
   * destruira la estructura haciendo un fclose
 */

@@ -24,13 +24,57 @@ int socket_inicializar(socket_t* self){
     self->file_descriptor = -1;
     return EXITO;
 }
-
+/*
+  * Inicializa la estructura hint dejandola valida
+*/
 void inicializar_struct_hints(struct addrinfo* hints, int ai_family,
                               int ai_socktype, int ai_flags){
       memset(hints, 0, sizeof(struct addrinfo));
       hints->ai_family = ai_family;
       hints->ai_socktype = ai_socktype;
       hints->ai_flags = ai_flags;
+}
+/*
+  * funcion auxiliar en donde se invoca la funcion bine del socket
+*/
+int bine_aux(int file_descriptor, struct addrinfo* rp){
+    return bind(file_descriptor, rp->ai_addr, rp->ai_addrlen);
+}
+/*
+  * funcion auxiliar en donde se invoca la funcion connect del socket
+*/
+int connect_aux(int file_descriptor, struct addrinfo* rp){
+    return connect(file_descriptor, rp->ai_addr, rp->ai_addrlen);
+}
+/*
+  * En esta funcion se itera por la lista que devuelve getaddrino tratando de
+  *hacer una conexcion con el socket que recibe y luego tratar de concetarse
+  * a la funcion que recibe como puntero, para el caso del bine_and_listen
+  * recibe bine_aux y para el caso del connectar recibe connect_aux
+  * devulve si se pudo hacer la correspondiente conexcion o no.
+*/
+bool iteracion_lista_getaddrinfo(socket_t* self, struct addrinfo* rp,
+                                int(*funcion_correspondiente_a_llamada_socket)
+                                (int,struct addrinfo*)){
+    bool hubo_un_error = true;
+    while (rp != NULL && hubo_un_error){
+        int file_descriptor = socket(rp->ai_family, rp->ai_socktype,
+                                   rp->ai_protocol);
+        if (file_descriptor == FALLA_SOCKET){
+            hubo_un_error = true;
+        } else {
+            if (funcion_correspondiente_a_llamada_socket(file_descriptor, rp)
+                  == FALLA_SOCKET){
+                close(file_descriptor);
+                hubo_un_error = true;
+            } else {
+                hubo_un_error = false;
+                self->file_descriptor = file_descriptor;
+            }
+        }
+        rp = rp->ai_next;
+    }
+    return hubo_un_error;
 }
 
 int socket_bine_and_listen(socket_t* self,
@@ -43,23 +87,7 @@ int socket_bine_and_listen(socket_t* self,
           return ERROR;
       }
       rp = resultado;
-      while (rp != NULL && no_pude_binear){
-          int file_descriptor = socket(rp->ai_family, rp->ai_socktype,
-                                       rp->ai_protocol);
-          if (file_descriptor == FALLA_SOCKET){
-              no_pude_binear = true;
-          } else {
-              if (bind(file_descriptor, rp->ai_addr, rp->ai_addrlen)
-                        == FALLA_SOCKET){
-                  close(file_descriptor);
-                  no_pude_binear = true;
-              } else {
-                  no_pude_binear = false;
-                  self->file_descriptor = file_descriptor;
-              }
-          }
-          rp = rp->ai_next;
-      }
+      no_pude_binear = iteracion_lista_getaddrinfo(self, rp, bine_aux);
       if (no_pude_binear){
           return ERROR;
       }
@@ -90,23 +118,7 @@ int socket_conectar(socket_t* self, const char* host, const char* service){
         return ERROR;
     }
     aux = resultado;
-    while (aux != NULL && no_hubo_conexion){
-        int file_descriptor = socket(aux->ai_family, aux->ai_socktype,
-                                     aux->ai_protocol);
-        if (file_descriptor == FALLA_SOCKET){
-            no_hubo_conexion = true;
-        } else {
-            if (connect(file_descriptor,aux->ai_addr,aux->ai_addrlen)
-                        == FALLA_SOCKET){
-                close(file_descriptor);
-                no_hubo_conexion = true;
-            } else {
-                no_hubo_conexion = false;
-                self->file_descriptor = file_descriptor;
-            }
-        }
-        aux = aux->ai_next;
-    }
+    no_hubo_conexion = iteracion_lista_getaddrinfo(self, aux, connect_aux);
     freeaddrinfo(resultado);
     if (no_hubo_conexion){
         return ERROR;
@@ -134,35 +146,14 @@ int socket_enviar(socket_t* self, const char* mensaje, size_t tamanio){
     }
     return EXITO;
 }
-
-int socket_recibir(socket_t* self, char* mensaje, size_t tamanio,
-                   socket_callback_t callback, void* callback_3){
+int socket_recibir(socket_t* self, char* mensaje, size_t tamanio){
     if (self->file_descriptor == FALLA_SOCKET){
           return ERROR;
     }
-    bool hubo_un_error = false;
     int bytes_recibidos = 0;
-    bool se_cerro_el_socket = false;
-    while (hubo_un_error == false && se_cerro_el_socket == false) {
-        int verificacion = recv(self->file_descriptor,&mensaje[bytes_recibidos],
-                                (tamanio - bytes_recibidos-1), 0);
-        if (verificacion == -1) {
-            hubo_un_error = true;
-        } else if (verificacion == 0) {
-            se_cerro_el_socket = true;
-        } else {
-            bytes_recibidos += verificacion;
-            callback(callback_3, mensaje, bytes_recibidos);
-            mensaje[bytes_recibidos] = '\0';
-            fwrite(mensaje, 1, bytes_recibidos, stdout);
-            bytes_recibidos = 0;
-        }
-      }
-      if (hubo_un_error) {
-          return ERROR;
-      } else {
-          return EXITO;
-      }
+    int verificacion = recv(self->file_descriptor,&mensaje[bytes_recibidos],
+                            (tamanio - bytes_recibidos -1), 0);
+    return verificacion;
 }
 
 void socket_destruir(socket_t* self){

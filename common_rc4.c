@@ -4,13 +4,20 @@
 #define TAMANIO_VECTOR_KS 256
 #define EXITO 0
 
+/*
+  * realiza un intercambio
+*/
 void swap(unsigned char* key_stream, int j, int k) {
     unsigned char aux = key_stream[j];
     key_stream[j] = key_stream[k];
     key_stream[k] = aux;
 }
-
-unsigned char* rc4_ksa(char* key, unsigned char key_stream[TAMANIO_VECTOR_KS]){
+/*
+  * esta funcion realiza el algortimo de inicializar el key_stream
+  * y dejarlo valido
+*/
+static unsigned char* rc4_ksa(char* key,
+                              unsigned char key_stream[TAMANIO_VECTOR_KS]){
     int j = 0;
     for (int i = 0; i < (TAMANIO_VECTOR_KS); i++){
         key_stream[i] = i;
@@ -29,8 +36,11 @@ int rc4_inicializar(rc4_t* self, char* key){
     self->pos_k = 0;
     return EXITO;
 }
-
-unsigned char rc4_prga(unsigned char* key_stream, int* j, int* k) {
+/*
+  * esta funcion se encarga de realizar el algorimo de encroptacion del mensaje
+  * con la key_stream
+*/
+static unsigned char rc4_prga(unsigned char* key_stream, int* j, int* k) {
     *j = (*j + 1) % TAMANIO_VECTOR_KS;
     *k = (*k + key_stream[*j])%TAMANIO_VECTOR_KS;
     swap(key_stream, *j, *k);
