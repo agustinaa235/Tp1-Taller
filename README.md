@@ -58,3 +58,24 @@ A su vez se hace otra verificacion de lo mismo cuando se invoca a encriptador en
 ![digrama encriptador_t con sus tipos de encriptadores](https://github.com/agustinaa235/Tp1/blob/master/encriptadores.png)
 
 ![digrama con callbacks](https://github.com/agustinaa235/tp0/blob/master/callbacks.png)
+
+#Segunda_entrega
+
+* Mejoras:
+    * Se crearon dos tdas mas( cliente y servidor) donde se encapsula todo en
+    una insterfaz que se encarga de inicializar y de liberar sus recursos.
+    Tambien que se encargue de cada una ejecutar las distintas funciones que
+    les corresponde en una funcion de run.
+    * Tambien se mejoraron los nombres de los punteros a funciones(callback)
+    por nnombre mas descriptivos.
+    * Se cambio la logica de recibir del socket donde este solo se encarga de
+    recibir los bytes y cargarlos en el buffer para luego procesar ese buffer
+    (desencriptando e imprimiendo) desde afuera. Logrando asi que el socket
+    no deba recibir ningun puntero a funcion.
+    * Se agregaron constantes a mensajes que eran imprimibles para que a
+    futuro sea mas facil cambiarlo en caso de requerirlo.
+# Digramas
+
+![digrama tda socket y cliente](https://github.com/agustinaa235/Tp1/blob/main/digrama_cliente_servidor.png)
+
+![digrama con callbaks](https://github.com/agustinaa235/Tp1/blob/main/interfacez_lector_socket2.0.png)    
