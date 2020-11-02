@@ -55,9 +55,9 @@ A su vez se hace otra verificacion de lo mismo cuando se invoca a encriptador en
 
 # Digramas
 
-![digrama encriptador_t con sus tipos de encriptadores](https://github.com/agustinaa235/Tp1/blob/master/encriptadores.png)
+![digrama encriptador_t con sus tipos de encriptadores](https://github.com/agustinaa235/Tp1/blob/main/encriptadores%20(1).png)
 
-![digrama con callbacks](https://github.com/agustinaa235/tp0/blob/master/callbacks.png)
+
 
 #Segunda_entrega
 
