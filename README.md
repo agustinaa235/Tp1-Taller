@@ -58,8 +58,7 @@ A su vez se hace otra verificacion de lo mismo cuando se invoca a encriptador en
 ![digrama encriptador_t con sus tipos de encriptadores](https://github.com/agustinaa235/Tp1/blob/main/encriptadores%20(1).png)
 
 
-
-#Segunda_entrega
+# Segunda_entrega
 
 * Mejoras:
     * Se crearon dos tdas mas( cliente y servidor) donde se encapsula todo en
